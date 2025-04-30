@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>AMY的工具箱 1.0.1</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        a.edit-link {
+            display: block;
+            margin-bottom: 10px;
+            color: #0066cc;
+            text-decoration: none;
+        }
+        a.edit-link:hover {
+            text-decoration: underline;
+        }
+        #buttonsContainer {
+            margin-top: 20px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #0084ff;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <a href="https://docs.google.com/spreadsheets/d/1ga9f117SjOxHvNQ9Cx9x1bwx-r3GRVa-ipDSOYjVDm8/edit?gid=0#gid=0" class="edit-link" target="_blank">編輯按鈕</a>
+    <a href="https://stationfronta18.github.io/snowren/" class="edit-link" target="_blank">台詞轉換</a>
+    <div id="buttonsContainer"></div>
+
+    <script>
+        const API_KEY = 'AIzaSyBF9oMJZ7TRjRpCxeQ8ardtg72fE4tq64E';
+        const SPREADSHEET_ID = '1ga9f117SjOxHvNQ9Cx9x1bwx-r3GRVa-ipDSOYjVDm8';
+        const range = '工作表1!A2:B';
+
+        axios.get(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${API_KEY}`)
+            .then(response => {
+                const data = response.data.values;
+                const container = document.getElementById('buttonsContainer');
+                if (data) {
+                    data.forEach((row) => {
+                        const buttonName = row[0];
+                        const buttonCode = row[1];
+                        const buttonElement = document.createElement('button');
+                        buttonElement.textContent = buttonName;
+                        buttonElement.onclick = () => copyCode(buttonCode);
+                        container.appendChild(buttonElement);
+                    });
+                } else {
+                    container.textContent = '無可用按鈕設定';
+                }
+            })
+            .catch(error => {
+                console.error('API 請求錯誤:', error);
+                document.getElementById('buttonsContainer').textContent = '數據加載失敗';
+            });
+
+        function copyCode(code) {
+            navigator.clipboard.writeText(code);
+        }
+    </script>
+</body>
+</html>
